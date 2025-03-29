@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>MBTI Kişilik Testi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 30px;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .question {
+      background-color: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .question h3 {
+      margin-bottom: 10px;
+    }
+
+    .option {
+      margin: 8px 0;
+      display: block;
+    }
+
+    button {
+      display: block;
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      font-size: 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin: 30px auto;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+
+    .result {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 30px;
+    }
+
+    .result h2 {
+      font-size: 24px;
+      color: #222;
+    }
+
+    .result ul {
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+
+    mark {
+      background: yellow;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🧠 MBTI Kişilik Testi</h1>
+<form id="mbtiForm">
+  <div id="questionsContainer"></div>
+  <button type="submit">Sonucu Göster</button>
+</form>
+
+<div id="result" class="result"></div>
+
+<script>
+const questions = [
+  {
+    axis: "EI",
+    text: "1. Diyelim ki kalabalık bir arkadaş grubuyla akşam yemeğindesin. Sohbet bol, kahkahalar yüksek, enerji tavan. Bu ortamdan sonra kendini nasıl hissedersin?",
+    a: "Enerjik, canlanmış ve mutlu hissederim. İnsanlarla olmak bana iyi gelir.",
+    b: "Biraz yorulmuş hissederim. Güzel vakit geçirmiş olsam da sonrasında yalnız kalmaya ihtiyaç duyarım."
+  },
+  {
+    axis: "EI",
+    text: "2. Yeni bir ortama girdiğinde...",
+    a: "İnsanlarla hemen iletişim kurarım, ortamı tanımak için konuşurum.",
+    b: "Önce gözlemlerim, sonra yavaş yavaş dahil olurum."
+  },
+  {
+    axis: "SN",
+    text: "3. Bir proje üzerinde çalışırken hangi yöntemi tercih edersin?",
+    a: "Somut veriler, önceki deneyimler ve adım adım ilerleme.",
+    b: "Yaratıcı fikirlerle başlarım, farklı yollar denerim."
+  },
+  {
+    axis: "SN",
+    text: "4. Günlük olayları anlatırken...",
+    a: "Detaylı, sıralı ve gerçeklere dayalı anlatırım.",
+    b: "Genel hatları ve fikirleri vurgularım."
+  },
+  {
+    axis: "SN",
+    text: "5. Yeni bir şey öğrenirken...",
+    a: "Deneyerek, uygulayarak öğrenmeyi tercih ederim.",
+    b: "Teorik altyapıyı öğrenip sonra uygularım."
+  },
+  {
+    axis: "FT",
+    text: "6. Bir arkadaşınla sorun yaşadığında nasıl yaklaşım sergilersin?",
+    a: "Neyin yanlış gittiğini objektif olarak analiz ederim.",
+    b: "Onun duygularını anlamaya çalışırım, ilişkimize öncelik veririm."
+  },
+  {
+    axis: "FT",
+    text: "7. Karar alırken genellikle...",
+    a: "Mantık ve gerçeklere göre hareket ederim.",
+    b: "İç sesime ve başkalarının duygularına göre karar veririm."
+  },
+  {
+    axis: "JP",
+    text: "8. Tatil planı yaparken...",
+    a: "Önceden rezervasyon, rota ve aktiviteleri planlarım.",
+    b: "Biraz araştırırım ama genelde spontane davranırım."
+  },
+  {
+    axis: "JP",
+    text: "9. Günlük işlerimi yürütürken...",
+    a: "Yapılacaklar listesiyle hareket ederim.",
+    b: "O an canım ne yapmak istiyorsa ona öncelik veririm."
+  },
+  {
+    axis: "JP",
+    text: "10. Birden fazla görevin varsa...",
+    a: "Önceliklendiririm ve sırayla yaparım.",
+    b: "Hangisini içimden gelirse onunla başlarım."
+  }
+];
+
+const mbtiTypes = {
+  ISTJ: {
+    name: "ISTJ – Lojistikçi",
+    desc: "Sorumluluk sahibi, düzenli ve güvenilirdir. Kurallara sadık, istikrarlı ve çalışkandır.",
+    traits: [
+      "🔹 Detaylara önem verirsin, sistemli çalışırsın.",
+      "🔹 Güvenilirliğinle tanınırsın.",
+      "🔹 Görev ve sorumluluklarını ciddiyetle yerine getirirsin.",
+      "🔹 Geleneklere saygılı ve kararlısın.",
+      "🔹 Uzun vadeli hedeflerle çalışmayı seversin.",
+      "🔹 Planlı ve dakiksin, sürprizleri sevmezsin."
+    ]
+  },
+  ISFJ: {
+    name: "ISFJ – Koruyucu",
+    desc: "Sadık, yardımsever ve detaylara dikkat eden kişilerdir. Sessiz ama özverili bir doğaya sahiptir.",
+    traits: [
+      "🔹 İnsanlara yardım etmekten keyif alırsın.",
+      "🔹 Duyarlı, sadık ve sabırlısındır.",
+      "🔹 Detaylara dikkat eder, planlı çalışırsın.",
+      "🔹 Takdir edilmek seni motive eder.",
+      "🔹 Geleneklere bağlı, düzenli bir yaşama önem verirsin.",
+      "🔹 Sessiz ama güçlü bir desteğe sahipsin."
+    ]
+  },
+  INFJ: {
+    name: "INFJ – Danışman",
+    desc: "Anlam arayışında olan, vizyoner, idealist ve derin düşünen kişilik tipidir.",
+    traits: [
+      "🔹 İnsanları içgüdülerinle iyi tanırsın.",
+      "🔹 Vizyon sahibisin, büyük resme odaklanırsın.",
+      "🔹 İçsel değerlerin senin için çok önemlidir.",
+      "🔹 Yalnızlık sana iyi gelir.",
+      "🔹 Derin ilişkiler kurmayı tercih edersin.",
+      "🔹 Başkalarına rehberlik etmeyi seversin."
+    ]
+  },
+  INTJ: {
+    name: "INTJ – Stratejist",
+    desc: "Analitik, bağımsız ve hedef odaklı kişilerdir. Strateji kurmakta ustadırlar.",
+    traits: [
+      "🔹 Uzun vadeli hedeflerle çalışmayı seversin.",
+      "🔹 Stratejik düşünürsün, planlı hareket edersin.",
+      "🔹 Bağımsız ve kararlısındır.",
+      "🔹 Yeni sistemler ve yapılar kurmayı seversin.",
+      "🔹 Duygulardan çok mantığa dayanırsın.",
+      "🔹 Zorlukları entelektüel bir meydan okuma olarak görürsün."
+    ]
+  },
+  ISTP: {
+    name: "ISTP – Zanaatkâr",
+    desc: "Mantıklı, gözlemci, esnek ve pratik çözümler üreten tip.",
+    traits: [
+      "🔹 Gerçekçisin: Somut verilerle çalışmayı seversin.",
+      "🔹 Mantıklısın: Objektif düşünürsün.",
+      "🔹 İçe dönüksün: Kalabalıklar yerine sessizlik seni besler.",
+      "🔹 Özgürlüğüne düşkünsün.",
+      "🔹 Sessiz gözlemcisin, olan biteni fark edersin.",
+      "🔹 El becerilerin güçlüdür: teknik işler, tasarım vb."
+    ]
+  },
+  ISFP: {
+    name: "ISFP – Maceraperest",
+    desc: "Sessiz, yaratıcı ve uyumlu kişilerdir. Estetik duyguları güçlüdür.",
+    traits: [
+      "🔹 Nazik, uyumlu ve iyi niyetlisin.",
+      "🔹 Estetik ve güzelliğe duyarlısın.",
+      "🔹 Duygularını derin yaşarsın, ama dışa vurmazsın.",
+      "🔹 Spontane olmayı seversin.",
+      "🔹 Yardım etmeyi seversin, ama sessiz kalmayı tercih edersin.",
+      "🔹 Sanatla ilgilenme eğilimin olabilir."
+    ]
+  },
+  INFP: {
+    name: "INFP – Arzucu",
+    desc: "Hayal gücü yüksek, idealist ve anlam arayışında olan bir kişiliktir.",
+    traits: [
+      "🔹 Duygularını yoğun yaşarsın.",
+      "🔹 Anlamlı ilişkiler ve işler ararsın.",
+      "🔹 Hayal gücün geniştir, yaratıcı yönün güçlüdür.",
+      "🔹 Empati yeteneğin çok gelişmiştir.",
+      "🔹 İç dünyan zengindir.",
+      "🔹 Kendi değerlerine bağlı yaşarsın."
+    ]
+  },
+  INTP: {
+    name: "INTP – Mantıkçı",
+    desc: "Analitik, bağımsız ve entelektüel bir kişilik. Karmaşık kavramları çözmeyi sever.",
+    traits: [
+      "🔹 Bağımsız çalışmayı seversin.",
+      "🔹 Karmaşık sistemleri anlamaya meraklısın.",
+      "🔹 Teorik düşünce yapısına sahipsin.",
+      "🔹 Meraklı ve sorgulayıcısın.",
+      "🔹 Özgün fikirlere sahipsin.",
+      "🔹 Tartışmayı bir öğrenme yolu olarak görürsün."
+    ]
+  },
+  ESTP: {
+    name: "ESTP – Girişimci",
+    desc: "Enerjik, pratik ve harekete geçmekte tereddüt etmeyen kişilik tipidir.",
+    traits: [
+      "🔹 Enerjiksin, anı yaşarsın.",
+      "🔹 Çözüm odaklısın, krize hızlı müdahale edersin.",
+      "🔹 Sosyal ve dışa dönüksün.",
+      "🔹 Spontane ve doğalsın.",
+      "🔹 Risk almaktan çekinmezsin.",
+      "🔹 Hareketli, hızlı karar alabilen bir yapın vardır."
+    ]
+  },
+  ESFP: {
+    name: "ESFP – Eğlendirici",
+    desc: "Sıcakkanlı, sosyal ve enerjik bir kişilik tipidir. Eğlence ve etkileşimi sever.",
+    traits: [
+      "🔹 Dışa dönüksün ve sosyal ortamlardan beslenirsin.",
+      "🔹 Hayattan keyif alırsın.",
+      "🔹 Estetik değerlere ve deneyime önem verirsin.",
+      "🔹 Duygularını kolayca ifade edersin.",
+      "🔹 Anı yaşarsın, gelecek planları seni sıkabilir.",
+      "🔹 İnsanlarla birlikte olmaktan hoşlanırsın."
+    ]
+  },
+  ENFP: {
+    name: "ENFP – Kampanyacı",
+    desc: "Yaratıcı, ilham verici ve özgür ruhlu bir kişiliktir.",
+    traits: [
+      "🔹 İnsanları motive etmeyi seversin.",
+      "🔹 Yeni fikirlere ve maceralara açıksın.",
+      "🔹 Duygularını paylaşmakta rahatsın.",
+      "🔹 Bağımsızlığına çok önem verirsin.",
+      "🔹 Yoğun hayal gücün vardır.",
+      "🔹 Rutinlerden sıkılırsın, çeşitlilik istersin."
+    ]
+  },
+  ENTP: {
+    name: "ENTP – Tartışmacı",
+    desc: "Zeki, meraklı ve fikir üretme konusunda yaratıcı bir kişilik.",
+    traits: [
+      "🔹 Tartışmayı sever ve yeni bakış açıları kazandırırsın.",
+      "🔹 Sürekli yeni fikirler peşindesin.",
+      "🔹 Hızlı düşünen, esnek bir yapın var.",
+      "🔹 Yenilikçi çözümler sunarsın.",
+      "🔹 Rutin seni sıkabilir.",
+      "🔹 İkna kabiliyetin yüksektir."
+    ]
+  },
+  ESTJ: {
+    name: "ESTJ – Yönetici",
+    desc: "Organize, lider ruhlu ve görev odaklı bir kişiliktir.",
+    traits: [
+      "🔹 Kurallara ve düzene önem verirsin.",
+      "🔹 Güçlü bir organizasyon yeteneğin vardır.",
+      "🔹 Mantıklı ve pratik kararlar alırsın.",
+      "🔹 Sorumluluk sahibisin.",
+      "🔹 Geleneksel değerlere saygılısın.",
+      "🔹 Zorluklar karşısında kararlısın."
+    ]
+  },
+  ESFJ: {
+    name: "ESFJ – Destekçi",
+    desc: "İnsanlara yardım etmeyi seven, sorumluluk sahibi bir kişiliktir.",
+    traits: [
+      "🔹 Başkalarının ihtiyaçlarını fark edersin.",
+      "🔹 Uyumlu, anlayışlı ve yardımseversin.",
+      "🔹 Düzenli ve sorumluluk sahibisin.",
+      "🔹 Sosyal ilişkilerde başarılısın.",
+      "🔹 Geleneksel değerlere bağlısın.",
+      "🔹 Başkalarının mutluluğu senin için önemlidir."
+    ]
+  },
+  ENFJ: {
+    name: "ENFJ – Öğretmen",
+    desc: "İlham verici, empatik ve yön gösterici bir kişiliktir.",
+    traits: [
+      "🔹 Liderlik özelliklerin güçlüdür.",
+      "🔹 Başkalarının potansiyelini görürsün.",
+      "🔹 İletişimin kuvvetlidir.",
+      "🔹 İdealist ve vizyonersin.",
+      "🔹 Duygusal olarak bağ kurarsın.",
+      "🔹 İnsanlara yardım etmekten mutluluk duyarsın."
+    ]
+  },
+  ENTJ: {
+    name: "ENTJ – Komutan",
+    desc: "Stratejik, karizmatik ve lider doğalı bir kişiliktir.",
+    traits: [
+      "🔹 Büyük hedefler peşinde koşarsın.",
+      "🔹 Doğuştan lider özelliklerine sahipsin.",
+      "🔹 Karar alırken kararlı ve analitiksin.",
+      "🔹 Planlama senin için hayati önemdedir.",
+      "🔹 Organizasyon yeteneğin yüksektir.",
+      "🔹 Zorlukları fırsata çevirebilirsin."
+    ]}
+
+};
+
+const scores = { E:0, I:0, S:0, N:0, F:0, T:0, J:0, P:0 };
+const container = document.getElementById("questionsContainer");
+
+questions.forEach((q, index) => {
+  container.innerHTML += `
+    <div class="question">
+      <h3>${q.text}</h3>
+      <label class="option">
+        <input type="radio" name="q${index}" value="A" required> A) ${q.a}
+      </label>
+      <label class="option">
+        <input type="radio" name="q${index}" value="B"> B) ${q.b}
+      </label>
+    </div>
+  `;
+});
+
+document.getElementById("mbtiForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  Object.keys(scores).forEach(k => scores[k] = 0);
+
+  questions.forEach((q, i) => {
+    const val = formData.get("q"+i);
+    const [a1, a2] = q.axis.split("");
+    if(val === "A") scores[a1]++;
+    else scores[a2]++;
+  });
+
+  const type = 
+    (scores.E >= scores.I ? "E" : "I") +
+    (scores.S >= scores.N ? "S" : "N") +
+    (scores.T >= scores.F ? "T" : "F") +
+    (scores.J >= scores.P ? "J" : "P");
+
+  const result = mbtiTypes[type] || { name: type, desc: "Açıklama bulunamadı.", traits: ["(Bu MBTI tipi için özellikler henüz eklenmedi.)"] };
+
+  const resultDiv = document.getElementById("result");
+  resultDiv.innerHTML = `
+    <h2>Sonuç: Senin MBTI tipin büyük olasılıkla <mark>${type}</mark>!</h2>
+    <p><strong>${result.name}:</strong> ${result.desc}</p>
+    <h3>💡 ${type} Kişilik Özellikleri:</h3>
+    <ul>${result.traits.map(t => `<li>${t}</li>`).join('')}</ul>
+  `;
+  window.scrollTo(0, document.body.scrollHeight);
+});
+</script>
+
+</body>
+</html>
